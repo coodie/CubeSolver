@@ -60,11 +60,11 @@ class CubeArea(Gtk.DrawingArea):
         gen_33_grid(0,6) + gen_33_grid(6,6) + gen_33_grid(9,6) )
 
 
-
-    def __init__(self):
+    def __init__(self, colorRef):
         super(CubeArea, self).__init__()
 
         self.grid_init()
+        self.colorRef = colorRef
 
         self.connect('draw', self.draw)
 
@@ -73,14 +73,21 @@ class CubeArea(Gtk.DrawingArea):
 
     def grid_init(self):
         self.grid = [ [ 0 for _ in range(0,3*3) ] for _ in range (0,3*4) ]
-        self.grid[10][4] = GCube.WHITE
-        self.grid[4][4] = GCube.YELLOW
-        self.grid[1][4] = GCube.BLUE
-        self.grid[7][4] = GCube.GREEN
-        self.grid[4][7] = GCube.RED
-        self.grid[4][1] = GCube.ORANGE
+        self.fill_grid(9,3,3,3, GCube.WHITE)
+        self.fill_grid(3,3,3,3, GCube.YELLOW)
+        self.fill_grid(0,3,3,3, GCube.BLUE)
+        self.fill_grid(6,3,3,3, GCube.GREEN)
+        self.fill_grid(3,6,3,3, GCube.RED)
+        self.fill_grid(3,0,3,3, GCube.ORANGE)
 
-    def draw(self, w, cr):
+
+    def fill_grid(self,x,y,x0,y0,col):
+        for i in range(x,x+x0):
+            for j in range(y,y+y0):
+                self.grid[i][j] = col
+
+
+    def draw(self, _, cr):
 
         cr.set_source_rgb(0,0,0)
         cr.set_line_width(3)
@@ -118,25 +125,78 @@ class CubeArea(Gtk.DrawingArea):
         x //= CubeArea.tile_x
         y //= CubeArea.tile_y
         if((x,y) in CubeArea.blocked_tiles): return
+
         if(e.button == 1):
             self.next_col(x,y)
         else:
             self.prev_col(x,y)
 
+        self.grid[x][y] = self.colorRef[0]
+
         self.queue_draw()
 
 
+class ColorWindow(Gtk.Window):
+    X_SIZE = CubeArea.tile_x*1
+    Y_SIZE = CubeArea.tile_x*7
+    def __init__(self, colorRef):
+        super(ColorWindow, self).__init__()
+        self.set_title("Kolor")
+        self.connect("destroy", Gtk.main_quit)
+        self.set_default_size(ColorWindow.X_SIZE, ColorWindow.Y_SIZE)
+        self.show_all()
+
+        self.colorRef = colorRef
+
+        self.set_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self.connect('button-press-event', self.mouse_click)
+
+        self.area = Gtk.DrawingArea()
+        self.area.set_events(Gdk.EventMask.BUTTON_PRESS_MASK)
+        self.area.connect('button-press-event', self.mouse_click)
+        self.area.connect('draw', self.draw)
+        self.add(self.area)
+
+    def draw(self,_,cr):
+        cr.set_source(GCube.colors[self.colorRef[0]])
+        cr.rectangle(0,0,CubeArea.tile_x, CubeArea.tile_y)
+        cr.fill()
+        cr.set_source_rgb(0,0,0)
+        cr.set_line_width(5)
+        cr.move_to(0,CubeArea.tile_y)
+        cr.line_to(ColorWindow.X_SIZE, CubeArea.tile_y)
+        cr.stroke()
 
 
+        for i in range(1, GCube.COLOR_AMOUNT):
+            cr.set_source(GCube.colors[i])
+            cr.rectangle(0,i*CubeArea.tile_y,CubeArea.tile_x, CubeArea.tile_y)
+            cr.fill()
 
+
+    def mouse_click(self,_,e):
+        x,y = int(e.x),int(e.y)
+        x //= CubeArea.tile_x
+        y //= CubeArea.tile_y
+
+        if (y > 0):
+            self.colorRef[0] = y
+
+        self.area.queue_draw()
 
 
 
 def init_gui():
-    area = CubeArea()
+    colorRef = [1]
+    cubeArea = CubeArea(colorRef)
     mainWindow = MainWindow()
-    mainWindow.add(area)
+    colorWindow = ColorWindow(colorRef)
+
+    colorWindow.show_all()
+
+    mainWindow.add(cubeArea)
     mainWindow.show_all()
+
 
 
 init_gui()
