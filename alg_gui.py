@@ -1,9 +1,6 @@
 from gi.repository import Gtk
-from gi.repository import Gdk
-
-import display_gui
-import cube
 import solver
+
 
 class StepDisplayer(Gtk.Box):
     X_SIZE = 100
@@ -20,6 +17,7 @@ class StepDisplayer(Gtk.Box):
         self.image.set_from_file("./images/"+step+".gif")
         self.set_size_request(StepDisplayer.X_SIZE, StepDisplayer.Y_SIZE)
         self.show()
+
 
 class AlgWindow(Gtk.Window):
     X_SIZE = 300
@@ -102,7 +100,3 @@ class AlgWindow(Gtk.Window):
                 self.display_step(self.cur_step)
                 self.cubeArea.from_cube(c)
                 self.cubeArea.queue_draw()
-
-
-
-

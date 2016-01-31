@@ -6,8 +6,8 @@ import os.path
 import cube
 
 
-
 proper_perm = set(range(0, 54))
+
 
 class TestBasePermutations(unittest.TestCase):
 
@@ -47,10 +47,11 @@ class TestSolving(unittest.TestCase):
         solution = "D B' L2 F' D' B2 R' F B U2 L F2 L2 D F2 B2 D' F2 U F2 U2"
         self.solve_attempt(cube_str, solution)
 
-    def solve_attempt(self,cube_str, solution):
+    def solve_attempt(self, cube_str, solution):
         c = cube.Cube(cube_str)
         c.execute(solution)
         self.assertEqual(c.get_string(), cube.get_solved_string())
+
 
 class FindImages(unittest.TestCase):
     images_names = "U Up U2 U2p R Rp R2 R2p F Fp F2 F2p D Dp D2 D2p L Lp L2 L2p B Bp B2 B2p"
@@ -61,11 +62,6 @@ class FindImages(unittest.TestCase):
 
     def try_to_find_image(self, fname):
         self.assertTrue(os.path.isfile(fname))
-
-
-
-
-
 
 
 if __name__ == "__main__":
