@@ -43,12 +43,6 @@ class CubeArea(Gtk.DrawingArea):
 
         st = cube.Cube()
         self.from_cube(st)
-        # self.fill_square(9, 3, cube.WHITE)
-        # self.fill_square(3, 3, cube.YELLOW)
-        # self.fill_square(0, 3, cube.BLUE)
-        # self.fill_square(6, 3, cube.GREEN)
-        # self.fill_square(3, 6, cube.RED)
-        # self.fill_square(3, 0, cube.ORANGE)
 
     def from_cube(self, cube):
         st = cube.get_string()
@@ -97,7 +91,7 @@ class CubeArea(Gtk.DrawingArea):
             x0 = CubeArea.tile_x*i
             for j in range(0, len(self.grid[i])):
                 y0 = CubeArea.tile_y*j
-                # print(x0,y0)
+
                 cr.set_source(cube.colors[self.grid[i][j]])
                 cr.rectangle(x0+2, y0+2, CubeArea.tile_x-4, CubeArea.tile_y-4)
                 cr.fill()

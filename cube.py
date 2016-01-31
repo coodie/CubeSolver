@@ -12,11 +12,7 @@ ORANGE = 4
 YELLOW = 5
 GREEN = 6
 
-
-color_map =     { 1 : 'B', 2 : 'D', 3 : 'L', 4 : 'U', 5 : 'F', 6 : 'R'}
-color_rev_map = {'B' : 1, 'D' : 2, 'L' : 3, 'U' : 4, 'F' : 5, 'R' : 6 }
-
-colors = [cairo.SolidPattern(0, 0, 0, 0),            # szary
+colors = [cairo.SolidPattern(0, 0, 0, 0),             # szary
           cairo.SolidPattern(1, 1, 1),                # bialy
           cairo.SolidPattern(153/256, 0, 0),          # czerwony
           cairo.SolidPattern(0, 0, 153/256),          # niebieski
@@ -24,12 +20,8 @@ colors = [cairo.SolidPattern(0, 0, 0, 0),            # szary
           cairo.SolidPattern(255, 255, 0),            # zolty
           cairo.SolidPattern(0, 153/256, 0)]          # zielony
 
-#       [0,1,2,3,4,5,6,7,8,
-#        9,10,11,12,13,14,15,16,17,
-#        18,19,20,21,22,23,24,25,26,
-#        27,28,29,30,31,32,33,34,35,
-#        36,37,38,39,40,41,42,43,44,
-#        45,46,47,48,49,50,51,52,53]
+color_map =     { ORANGE: 'B', WHITE : 'D', BLUE : 'L', YELLOW: 'U', RED : 'F', GREEN: 'R'}
+color_rev_map = {v: k for k, v in color_map.items()}
 
 Uperm = [6, 3, 0, 7, 4, 1, 8, 5, 2,
          45,46,47,12,13,14,15,16,17,
@@ -77,13 +69,6 @@ def get_solved_string():
     return "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
 
 class Cube():
-    B = WHITE -1
-    D = RED   -1
-    L = BLUE  -1
-    U = ORANGE-1
-    F = YELLOW-1
-    R = GREEN -1
-
 
     def __init__(self, rep ="UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"):
         self.rep = rep
@@ -104,11 +89,20 @@ class Cube():
         print(steps)
         self.execute(steps)
 
-
     def execute(self, seq):
         steps = seq.split(" ")
         for move in steps:
             self.one_step(move)
+
+    def rev_one_step(self, move):
+        base = move[0]
+        if len(move) > 1:
+            if(move[1] == "'"):
+                self.one_step(move[0:1])
+            else:
+                self.one_step(move)
+        else:
+            self.one_step(move+"'")
 
     def one_step(self, move):
         base = move[0]

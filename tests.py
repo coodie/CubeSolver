@@ -2,9 +2,7 @@
 
 import unittest
 
-import display_gui
-import alg_gui
-
+import os.path
 import cube
 
 
@@ -53,6 +51,20 @@ class TestSolving(unittest.TestCase):
         c = cube.Cube(cube_str)
         c.execute(solution)
         self.assertEqual(c.get_string(), cube.get_solved_string())
+
+class FindImages(unittest.TestCase):
+    images_names = "U Up U2 U2p R Rp R2 R2p F Fp F2 F2p D Dp D2 D2p L Lp L2 L2p B Bp B2 B2p"
+
+    def test_find_images(self):
+        for name in FindImages.images_names.split(" "):
+            self.try_to_find_image("./images/"+name+".gif")
+
+    def try_to_find_image(self, fname):
+        self.assertTrue(os.path.isfile(fname))
+
+
+
+
 
 
 
