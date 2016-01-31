@@ -40,14 +40,26 @@ class CubeArea(Gtk.DrawingArea):
 
     def grid_init(self):
         self.grid = [[0 for _ in range(0, 3*3)] for _ in range(0, 3*4)]
-        self.fill_square(9, 3, cube.WHITE)
-        self.fill_square(3, 3, cube.YELLOW)
-        self.fill_square(0, 3, cube.BLUE)
-        self.fill_square(6, 3, cube.GREEN)
-        self.fill_square(3, 6, cube.RED)
-        self.fill_square(3, 0, cube.ORANGE)
 
-    def get_cube_string(self):
+        st = cube.Cube()
+        self.from_cube(st)
+        # self.fill_square(9, 3, cube.WHITE)
+        # self.fill_square(3, 3, cube.YELLOW)
+        # self.fill_square(0, 3, cube.BLUE)
+        # self.fill_square(6, 3, cube.GREEN)
+        # self.fill_square(3, 6, cube.RED)
+        # self.fill_square(3, 0, cube.ORANGE)
+
+    def from_cube(self, cube):
+        st = cube.get_string()
+        self.str_to_square(st[0:9], 3, 0)
+        self.str_to_square(st[9:18], 6, 3)
+        self.str_to_square(st[18:27], 3, 3)
+        self.str_to_square(st[27:36], 3, 6)
+        self.str_to_square(st[36:45], 0, 3)
+        self.str_to_square(st[45:54], 9, 3)
+
+    def get_cube(self):
         res = ''
         res = res + self.square_to_str(3, 0)
         res = res + self.square_to_str(6, 3)
@@ -55,7 +67,14 @@ class CubeArea(Gtk.DrawingArea):
         res = res + self.square_to_str(3, 6)
         res = res + self.square_to_str(0, 3)
         res = res + self.square_to_str(9, 3)
-        return res
+        return cube.Cube(res)
+
+    def str_to_square(self, st, x, y):
+        k = 0
+        for i in range(y, y+3):
+            for j in range(x, x+3):
+                self.grid[j][i] = cube.color_rev_map[st[k]]
+                k = k+1
 
     def square_to_str(self, x, y):
         res = ''
@@ -100,6 +119,11 @@ class CubeArea(Gtk.DrawingArea):
 
         if(e.button == 1):
             self.grid[x][y] = self.colorRef.val
+        else:
+            c = self.get_cube()
+            c.solve()
+            self.from_cube(c)
+
         self.queue_draw()
 
 

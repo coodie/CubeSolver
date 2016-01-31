@@ -3,6 +3,7 @@
 from ref import Ref
 from gi.repository import Gtk
 import display_gui
+import alg_gui
 
 
 def init_gui():
@@ -15,6 +16,9 @@ def init_gui():
 
     mainWindow.add(cubeArea)
     mainWindow.show_all()
+
+    algWindow = alg_gui.AlgWindow(cubeArea)
+    algWindow.show_all()
 
 
 init_gui()
