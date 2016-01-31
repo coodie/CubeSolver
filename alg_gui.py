@@ -16,33 +16,49 @@ class AlgWindow(Gtk.Window):
         self.set_default_size(AlgWindow.X_SIZE, AlgWindow.Y_SIZE)
         self.set_position(Gtk.WindowPosition.CENTER)
 
-        hbox = Gtk.Box(spacing=6)
+        hbox = Gtk.Box(Gtk.Orientation.VERTICAL, spacing=6)
         self.add(hbox)
 
-        button = Gtk.Button.new_with_label("Solve")
+        button = Gtk.Button.new_with_label("Find Solution")
         button.connect("clicked", self.solve_button)
-        hbox.pack_start(button, True, True, 0)
+        hbox.pack_start(button, True, True, 6)
 
         button = Gtk.Button.new_with_label("Next")
         button.connect("clicked", self.next_button)
-        hbox.pack_start(button, True, True, 0)
+        hbox.pack_start(button, True, True, 6)
+
+        button = Gtk.Button.new_with_label("Prev")
+        button.connect("clicked", self.prev_button)
+        hbox.pack_start(button, True, True, 6)
+
+        self.display = Gtk.TextView()
+        hbox.pack_start(self.display, True, True, 6)
+
 
         self.cubeArea = cubeArea
         self.solving = False
         self.steps = [""]
         self.cur_step = 0
 
+    def set_text_on_display(self, msg):
+        self.display.get_buffer().set_text(msg)
 
     def solve_button(self, button):
         self.solving = True
         c = self.cubeArea.get_cube()
         try:
             steps = solver.solve(c.get_string())
+            print(steps)
+            print(c.get_string())
+            self.set_text_on_display(steps)
             self.steps = steps.split(" ")
         except ValueError:
-            print("Invalid cube scramble")
+            self.set_text_on_display("Invalid cube scramble")
             self.solving = False
         self.cur_step = 0
+
+    def prev_button(self, button):
+        pass
 
     def next_button(self, button):
         if self.solving:

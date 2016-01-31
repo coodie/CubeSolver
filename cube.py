@@ -73,15 +73,8 @@ Dperm = [0, 1, 2, 3, 4, 5, 6, 7, 8,
          36,37,38,39,40,41,51,52,53,
          45,46,47,48,49,50,15,16,17]
 
-def is_perm(x):
-    return len(set(x)) == len(x)
-
-print(is_perm(Bperm))
-print(is_perm(Dperm))
-print(is_perm(Lperm))
-print(is_perm(Uperm))
-print(is_perm(Fperm))
-print(is_perm(Rperm))
+def get_solved_string():
+    return "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
 
 class Cube():
     B = WHITE -1
@@ -91,13 +84,13 @@ class Cube():
     F = YELLOW-1
     R = GREEN -1
 
-    def __init__(self, rep = "RURUUURFRFBFRRRURUURUFFDFFBDDLDDBDDLBFBLLLLLLDLDUBBFBB"
-                 #"UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
-                 ):
-        self.rep = rep # "RURUUURFRFBFRRRURUURUFFDFFBDDLDDBDDLBFBLLLLLLDLDUBBFBB"
+
+    def __init__(self, rep ="UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"):
+        self.rep = rep
 
     def get_string(self):
         return self.rep
+
 
     def apply_perm(self, perm):
         old = ""
@@ -133,13 +126,15 @@ class Cube():
     def base_step(self, move):
         if move == "B":
             self.apply_perm(Bperm)
-        if move == "D":
+        elif move == "D":
             self.apply_perm(Dperm)
-        if move == "L":
+        elif move == "L":
             self.apply_perm(Lperm)
-        if move == "U":
+        elif move == "U":
             self.apply_perm(Uperm)
-        if move == "F":
+        elif move == "F":
             self.apply_perm(Fperm)
-        if move == "R":
+        elif move == "R":
             self.apply_perm(Rperm)
+        else:
+            raise ValueError("Unknown move: " + move)
