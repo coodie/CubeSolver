@@ -1,5 +1,4 @@
 import cairo
-import solver
 
 
 COLOR_AMOUNT = 7
@@ -11,14 +10,25 @@ ORANGE = 4
 YELLOW = 5
 GREEN = 6
 
-colors = [cairo.SolidPattern(0, 0, 0, 0),             # szary
-          cairo.SolidPattern(1, 1, 1),                # bialy
-          cairo.SolidPattern(153/256, 0, 0),          # czerwony
-          cairo.SolidPattern(0, 0, 153/256),          # niebieski
-          cairo.SolidPattern(204/256, 102/256, 0),    # pomaranczowy
-          cairo.SolidPattern(255, 255, 0),            # zolty
-          cairo.SolidPattern(0, 153/256, 0)]          # zielony
+'''
+Order of colors is listed as:
+colors[0] = grey
+colors[1] = white
+colors[2] = red
+colors[3] = blue
+colors[4] = orange
+colors[5] = yellow
+colors[6] = green
+'''
+colors = [cairo.SolidPattern(0, 0, 0, 0),
+          cairo.SolidPattern(1, 1, 1),
+          cairo.SolidPattern(153/256, 0, 0),
+          cairo.SolidPattern(0, 0, 153/256),
+          cairo.SolidPattern(204/256, 102/256, 0),
+          cairo.SolidPattern(255, 255, 0),
+          cairo.SolidPattern(0, 153/256, 0)]
 
+''' Maps color ints to sides they are associated with '''
 color_map = {
     ORANGE: 'B',
     WHITE: 'D',
@@ -26,6 +36,8 @@ color_map = {
     YELLOW: 'U',
     RED: 'F',
      GREEN: 'R'}
+
+''' Is inversion of color map '''
 color_rev_map = {v: k for k, v in color_map.items()}
 
 Uperm = [6, 3, 0, 7, 4, 1, 8, 5, 2,
@@ -75,6 +87,63 @@ def get_solved_string():
     return "UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB"
 
 
+'''
+             |************|
+             |*U1**U2**U3*|
+             |************|
+             |*U4**U5**U6*|
+             |************|
+             |*U7**U8**U9*|
+             |************|
+ ************|************|************|************
+ *L1**L2**L3*|*F1**F2**F3*|*R1**R2**F3*|*B1**B2**B3*
+ ************|************|************|************
+ *L4**L5**L6*|*F4**F5**F6*|*R4**R5**R6*|*B4**B5**B6*
+ ************|************|************|************
+ *L7**L8**L9*|*F7**F8**F9*|*R7**R8**R9*|*B7**B8**B9*
+ ************|************|************|************
+             |************|
+             |*D1**D2**D3*|
+             |************|
+             |*D4**D5**D6*|
+             |************|
+             |*D7**D8**D9*|
+             |************|
+
+Cube is represented as string.
+Where at certain positions are colors from cube.
+For example string starting with UBL...
+means that at U1 position we have U1 color
+at U2 position we have B color, at U3
+position we have L color and so on.
+
+Positions of colors in string are listed below:
+
+ U1, U2, U3, U4, U5, U6, U7, U8, U9,
+ R1, R2, R3, R4, R5, R6, R7, R8, R9,
+ F1, F2, F3, F4, F5, F6, F7, F8, F9,
+ D1, D2, D3, D4, D5, D6, D7, D8, D9,
+ L1, L2, L3, L4, L5, L6, L7, L8, L9,
+ B1, B2, B3, B4, B5, B6, B7, B8, B9.
+
+Assuming:
+UUUUUUUUURRRRRRRRRFFFFFFFFFDDDDDDDDDLLLLLLLLLBBBBBBBBB
+represents soved cube.
+
+Solution notation is the notation used by speedcubers.
+
+Order to define a rotation of face of the cube
+it is enough to permute the string in a way
+representing specific rotation. Like, doing U
+rotation would permute in a way:
+F1 -> R1,
+R1 -> B1
+B1 -> L1
+L1 -> F1
+... and so on
+'''
+
+
 class Cube():
 
     def __init__(
@@ -85,22 +154,16 @@ class Cube():
     def get_string(self):
         return self.rep
 
-    def apply_perm(self, perm):
-        old = ""
-        for i in range(0, len(perm)):
-            old += self.rep[perm[i]]
-        self.rep = old
-
-    def solve(self):
-        print(self.rep)
-        steps = solver.solve(self.rep)
-        print(steps)
-        self.execute(steps)
+    ''' Executes sequence of steps on the cube'''
 
     def execute(self, seq):
         steps = seq.split(" ")
         for move in steps:
             self.one_step(move)
+
+    '''Performs one step, but reversed.
+    like instead of doing R', it does R,
+    and opposite. '''
 
     def rev_one_step(self, move):
         if len(move) > 1:
@@ -110,6 +173,15 @@ class Cube():
                 self.one_step(move)
         else:
             self.one_step(move+"'")
+
+    '''Performs one step on the cube.
+    Some steps can be disassembled into couple
+    more base steps like
+    R' = R R R,
+    R2 = R R
+    so it's enough to just define base step
+    and use combine them to have more steps.
+    '''
 
     def one_step(self, move):
         base = move[0]
@@ -123,6 +195,8 @@ class Cube():
                 self.base_step(base)
         else:
             self.base_step(move)
+
+    '''Performs base step, for which there is direct permutation'''
 
     def base_step(self, move):
         if move == "B":
@@ -139,3 +213,11 @@ class Cube():
             self.apply_perm(Rperm)
         else:
             raise ValueError("Unknown move: " + move)
+
+    ''' Applies base permutation '''
+
+    def apply_perm(self, perm):
+        old = ""
+        for i in range(0, len(perm)):
+            old += self.rep[perm[i]]
+        self.rep = old
